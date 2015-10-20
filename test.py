@@ -1,8 +1,9 @@
 import subprocess, sys
 from subprocess import Popen, PIPE, STDOUT
+import re
 
 '''
-    Test the tagger with data 'tag_dev.dat'.
+    Test the tagger with stdin input.
 '''
 
 class Data:
@@ -11,14 +12,12 @@ class Data:
         self.sentences = [] # test data
         self.features = {} # model
 
-    def read_sentences(self, lines):
+    def read_sentences(self, input):
+        words = re.split(', | ', input.rstrip('\.\n'))
         sentence = ""
-        for line in lines:
-            if line == "\n":
-                self.sentences.append(sentence);
-                sentence = ""
-            else:
-                sentence += line
+        for word in words:
+            sentence += word + "\n"
+        self.sentences.append(sentence)
 
     def read_model(self, lines1, lines2):
         for line in lines1:
@@ -81,10 +80,12 @@ def score(history, words, data):
 
 def main():
     data = Data()
-    data.read_sentences(open("tag_dev.dat").readlines())
+    print "Input sentence:"
+    data.read_sentences(sys.stdin.readline())
+    print ""
     data.read_model(open("tag.model").readlines(), open("suffix_tagger.model").readlines())
     process(data)
 
 if __name__ == "__main__":
-    main()
+  main()
 
